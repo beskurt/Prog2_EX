@@ -43,18 +43,21 @@ public class HomeController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         observableMovies.addAll(allMovies);
 
+        //For Filter and Sort Logic
         FilteredList<Movie> filteredMovies = new FilteredList<>(observableMovies, movie -> true);
         SortedList<Movie> sortedMovies = new SortedList<>(filteredMovies);
 
         movieListView.setItems(sortedMovies);
         movieListView.setCellFactory(movieListView -> new MovieCell());
 
+        //Adds all genre
         genreComboBox.getItems().addAll(
                 Arrays.stream(Genre.values())
                         .map(Enum::name)
                         .toArray(String[]::new)
         );
 
+        //Search button
         genreComboBox.setPromptText("Filter by Genre");
         searchBtn.setText("Search");
         searchBtn.setOnAction(event -> {
@@ -62,11 +65,13 @@ public class HomeController implements Initializable {
                     searchField.getText());
         });
 
+        //Clear button
         clearBtn.setText("Clear");
         clearBtn.setOnAction(event -> {
             clearFilters(filteredMovies, sortedMovies);
         });
 
+        //Sort button asc/desc
         sortBtn.setOnAction(actionEvent -> {
             if (isAscending) {
                 sortedMovies.setComparator(Comparator.comparing(Movie::getTitle));
@@ -80,6 +85,7 @@ public class HomeController implements Initializable {
 
     }
 
+    //Method for search button
     public void search(FilteredList<Movie> filteredMovies, String genre, String query) {
         filteredMovies.setPredicate(movie -> {
             boolean matchesQuery = (query == null || query.isEmpty()) ||
@@ -90,6 +96,7 @@ public class HomeController implements Initializable {
         });
     }
 
+    //Method for clear button
     private void clearFilters(FilteredList<Movie> filteredList, SortedList<Movie> sortedList) {
         searchField.clear();
         genreComboBox.getSelectionModel().clearSelection();
