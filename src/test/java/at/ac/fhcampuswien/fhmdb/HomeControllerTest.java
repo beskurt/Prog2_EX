@@ -1,12 +1,13 @@
 package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.models.Movie;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HomeControllerTest {
     private List<Movie> movies;
@@ -16,36 +17,6 @@ class HomeControllerTest {
 
     @BeforeEach
     void setUp() {
-        movies = List.of(
-                //ChatGPT movies
-                new Movie("Inception", "A mind-bending thriller about dreams."),
-                new Movie("The Godfather", "A mafia family drama."),
-                new Movie("Life of Pi", "A survival story of a boy and a tiger."),
-                new Movie("Titanic", "A tragic love story on a sinking ship."),
-                new Movie("Interstellar", "A space exploration journey."),
-                new Movie("The Dark Knight", "A Batman movie with the Joker."),
-                new Movie("Schindler's List", "A true story of a businessman saving Jews during WWII."),
-                new Movie("The Shawshank Redemption", "A man imprisoned for a crime he didn't commit."),
-                new Movie("Forrest Gump", "A slow-witted man’s extraordinary life journey."),
-                new Movie("Gladiator", "A betrayed Roman general seeks revenge."),
-                new Movie("The Matrix", "A hacker discovers the truth about reality."),
-                new Movie("Pulp Fiction", "A series of interconnected crime stories."),
-                new Movie("The Lion King", "A young lion prince flees his kingdom."),
-                new Movie("Finding Nemo", "A father fish searches for his lost son."),
-                new Movie("The Silence of the Lambs", "A young FBI agent seeks help from a cannibal."),
-                new Movie("Saving Private Ryan", "A WWII mission to save a paratrooper."),
-                new Movie("Joker", "An origin story of the infamous villain."),
-                new Movie("Toy Story", "Toys come to life when no one is looking."),
-                new Movie("Frozen", "A princess with icy powers embraces her true self."));
-        moviesOrder = List.of(
-                new Movie("Joker4", "An origin story of the infamous villain."),
-                new Movie("Joker2", "An origin story of the infamous villain."),
-                new Movie("Joker1", "An origin story of the infamous villain."),
-                new Movie("Joker11", "An origin story of the infamous villain."),
-                new Movie("Toy Story 4", "Toys come to life when no one is looking."),
-                new Movie("Toy Story1 ", "Toys come to life when no one is looking."),
-                new Movie("Toy Story 1", "Toys come to life when no one is looking."),
-                new Movie("Toy Story 3", "Toys come to life when no one is looking."));
     }
 
     @Test
@@ -159,6 +130,7 @@ class HomeControllerTest {
         assertEquals("Toy Story", sortedMovies.get(0).getTitle());
         assertEquals("Finding Nemo", sortedMovies.get(sortedMovies.size() - 1).getTitle());
     }
+
     @Test
     void testSortMoviesDescending_ManipulatedList() {
         List<Movie> sortedMovies = moviesOrder

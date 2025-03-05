@@ -27,11 +27,11 @@ public class Movie {
         return genres;
     }
 
-    public static List<Movie> initializeMovies(){
+    public static List<Movie> initializeMovies() {
         List<Movie> movies = new ArrayList<>();
         movies.add(new Movie(
                 "Life Is Beautiful",
-                "When an open-minded Jewish librarian and his son become victims of the Holocaust, he uses a perfect mixture of will, humor, and imagination to protect his son from the dangers around their camp." ,
+                "When an open-minded Jewish librarian and his son become victims of the Holocaust, he uses a perfect mixture of will, humor, and imagination to protect his son from the dangers around their camp.",
                 Arrays.asList(Genre.DRAMA, Genre.ROMANCE)));
         movies.add(new Movie(
                 "The Usual Suspects",
