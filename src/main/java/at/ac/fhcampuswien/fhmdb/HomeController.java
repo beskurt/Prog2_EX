@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -31,17 +32,21 @@ public class HomeController implements Initializable {
     public JFXComboBox<String> genreComboBox;
     @FXML
     public JFXButton sortBtn;
-    public List<Movie> allMovies = Movie.initializeMovies();
+    @FXML
+    public JFXButton clearBtn;
 
-    private FilteredList<Movie> filteredMovies;
+    public List<Movie> allMovies = Movie.initializeMovies();
+    private boolean isAscending = false;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        observableMovies.addAll(allMovies);         // add dummy data to observable list
+        observableMovies.addAll(allMovies);
 
-        filteredMovies = new FilteredList<>(observableMovies, movie -> true);
-        movieListView.setItems(filteredMovies);
+        FilteredList<Movie> filteredMovies = new FilteredList<>(observableMovies, movie -> true);
+        SortedList<Movie> sortedMovies = new SortedList<>(filteredMovies);
+
+        movieListView.setItems(sortedMovies);
         movieListView.setCellFactory(movieListView -> new MovieCell());
 
         genreComboBox.getItems().addAll(
@@ -51,52 +56,47 @@ public class HomeController implements Initializable {
         );
 
         genreComboBox.setPromptText("Filter by Genre");
+        searchBtn.setText("Search");
         searchBtn.setOnAction(event -> {
-            applyAllFilters(searchField.getText().toLowerCase().trim(),
-                    Genre.valueOf(genreComboBox.getSelectionModel().getSelectedItem()));
+            search(filteredMovies, genreComboBox.getSelectionModel().getSelectedItem(),
+                    searchField.getText());
         });
 
+        clearBtn.setText("Clear");
+        clearBtn.setOnAction(event -> {
+            clearFilters(filteredMovies, sortedMovies);
+        });
 
         sortBtn.setOnAction(actionEvent -> {
-            if (sortBtn.getText().equals("Sort (asc)")) {
+            if (isAscending) {
+                sortedMovies.setComparator(Comparator.comparing(Movie::getTitle));
                 sortBtn.setText("Sort (desc)");
-                FXCollections.sort(observableMovies, Comparator.comparing(Movie::getTitle));
             } else {
+                sortedMovies.setComparator(Comparator.comparing(Movie::getTitle).reversed());
                 sortBtn.setText("Sort (asc)");
-                FXCollections.sort(observableMovies, Comparator.comparing(Movie::getTitle).reversed());
             }
+            isAscending = !isAscending;
         });
 
     }
 
-    public void applyAllFilters(String searchQuery, Genre genre) {
-        List<Movie> filteredMovies = allMovies;
-        if (!searchQuery.isEmpty()) {
-            filteredMovies = filterByQuery(filteredMovies, searchQuery);
-        }
-        if (genre != null && !genre.equals(Genre.ALL)) {
-            filteredMovies = filterByGenre(filteredMovies, Genre.valueOf(genre.toString()));
-        }
-        observableMovies.clear();
-        observableMovies.addAll(filteredMovies);
+    public void search(FilteredList<Movie> filteredMovies, String genre, String query) {
+        filteredMovies.setPredicate(movie -> {
+            boolean matchesQuery = (query == null || query.isEmpty()) ||
+                    movie.getTitle().toLowerCase().contains(query.toLowerCase());
+            boolean matchesGenre = (genre == null || genre.isEmpty()) ||
+                    movie.getGenres().contains(Genre.valueOf(genre));
+            return matchesQuery && matchesGenre;
+        });
     }
 
-
-    public List<Movie> filterByQuery(List<Movie> movies, String query) {
-        if (query == null || query.isEmpty()) return movies;
-        return movies.stream()
-                .filter(movie ->
-                        movie.getTitle().toLowerCase().contains(query.toLowerCase()) ||
-                                movie.getDescription().toLowerCase().contains(query.toLowerCase())
-                )
-                .toList();
-    }
-
-    public List<Movie> filterByGenre(List<Movie> movies, Genre genre) {
-        if (genre == null) return movies;
-        return movies.stream()
-                .filter(movie -> movie.getGenres().contains(genre))
-                .toList();
+    private void clearFilters(FilteredList<Movie> filteredList, SortedList<Movie> sortedList) {
+        searchField.clear();
+        genreComboBox.getSelectionModel().clearSelection();
+        filteredList.setPredicate(movie -> true);
+        isAscending = true;
+        sortBtn.setText("Sort (asc)");
+        sortedList.setComparator(Comparator.comparing(Movie::getTitle));
     }
 
 }
