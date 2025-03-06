@@ -15,95 +15,110 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HomeController implements Initializable {
-    private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();   // automatically updates corresponding UI elements when underlying data changes
-    @FXML
-    public JFXButton searchBtn;
-    @FXML
-    public TextField searchField;
-    @FXML
-    public JFXListView<Movie> movieListView;
-    @FXML
-    public JFXComboBox<String> genreComboBox;
-    @FXML
-    public JFXButton sortBtn;
-    @FXML
-    public JFXButton clearBtn;
+    private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
 
-    public List<Movie> allMovies = Movie.initializeMovies();
-    private boolean isAscending = false;
+    @FXML
+    private JFXButton searchBtn, sortBtn, clearBtn;
 
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private JFXListView<Movie> movieListView;
+
+    @FXML
+    private JFXComboBox<String> genreComboBox;
+
+    private boolean isAscending = true;
+    private List<Movie> allMovies;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        allMovies = Movie.initializeMovies();
         observableMovies.addAll(allMovies);
 
-        //For Filter and Sort Logic
+        // Create filter & sort lists
         FilteredList<Movie> filteredMovies = new FilteredList<>(observableMovies, movie -> true);
         SortedList<Movie> sortedMovies = new SortedList<>(filteredMovies);
-
         movieListView.setItems(sortedMovies);
         movieListView.setCellFactory(movieListView -> new MovieCell());
 
-        //Adds all genre
-        genreComboBox.getItems().addAll(
-                Arrays.stream(Genre.values())
-                        .map(Enum::name)
-                        .toArray(String[]::new)
-        );
+        // Initialize UI elements
+        initializeGenreComboBox();
+        initializeButtonHandlers(filteredMovies, sortedMovies);
+    }
 
-        //Search button
+    /**
+     * Populates genre filter dropdown.
+     */
+    private void initializeGenreComboBox() {
+        genreComboBox.getItems().addAll(Arrays.stream(Genre.values())
+                .map(Enum::name)
+                .toList());
         genreComboBox.setPromptText("Filter by Genre");
+    }
+
+    /**
+     * Sets up button event handlers.
+     */
+    private void initializeButtonHandlers(FilteredList<Movie> filteredMovies, SortedList<Movie> sortedMovies) {
         searchBtn.setText("Search");
-        searchBtn.setOnAction(event -> {
-            search(filteredMovies, genreComboBox.getSelectionModel().getSelectedItem(),
-                    searchField.getText());
-        });
+        searchBtn.setOnAction(event -> searchMovies(filteredMovies));
 
-        //Clear button
         clearBtn.setText("Clear");
-        clearBtn.setOnAction(event -> {
-            clearFilters(filteredMovies, sortedMovies);
-        });
+        clearBtn.setOnAction(event -> clearFilters(filteredMovies));
 
-        //Sort button asc/desc
-        sortBtn.setOnAction(actionEvent -> {
-            if (isAscending) {
-                sortedMovies.setComparator(Comparator.comparing(Movie::getTitle));
-                sortBtn.setText("Sort (desc)");
-            } else {
-                sortedMovies.setComparator(Comparator.comparing(Movie::getTitle).reversed());
-                sortBtn.setText("Sort (asc)");
-            }
-            isAscending = !isAscending;
-        });
-
-    }
-
-    //Method for search button
-    public void search(FilteredList<Movie> filteredMovies, String genre, String query) {
-        filteredMovies.setPredicate(movie -> {
-            boolean matchesQuery = (query == null || query.isEmpty()) ||
-                    movie.getTitle().toLowerCase().contains(query.toLowerCase());
-            boolean matchesGenre = (genre == null || genre.isEmpty()) ||
-                    movie.getGenres().contains(Genre.valueOf(genre));
-            return matchesQuery && matchesGenre;
+        sortBtn.setOnAction(event -> {
+            toggleSorting(sortedMovies);
         });
     }
 
-    //Method for clear button
-    private void clearFilters(FilteredList<Movie> filteredList, SortedList<Movie> sortedList) {
+    /**
+     * Searches movies based on genre and query.
+     */
+    private void searchMovies(FilteredList<Movie> filteredMovies) {
+        String genre = genreComboBox.getSelectionModel().getSelectedItem();
+        String query = searchField.getText();
+        filteredMovies.setPredicate(movie -> matchesQuery(movie, query) && matchesGenre(movie, genre));
+    }
+
+    /**
+     * Clears filters and resets the movie list.
+     */
+    private void clearFilters(FilteredList<Movie> filteredMovies) {
         searchField.clear();
         genreComboBox.getSelectionModel().clearSelection();
-        filteredList.setPredicate(movie -> true);
-        isAscending = true;
-        sortBtn.setText("Sort (asc)");
-        sortedList.setComparator(Comparator.comparing(Movie::getTitle));
+        filteredMovies.setPredicate(movie -> true);
+    }
+
+    /**
+     * Toggles sorting between ascending & descending order.
+     */
+    private void toggleSorting(SortedList<Movie> sortedMovies) {
+        sortedMovies.setComparator(isAscending ?
+                Comparator.comparing(Movie::getTitle) :
+                Comparator.comparing(Movie::getTitle).reversed());
+
+        sortBtn.setText(isAscending ? "Sort (desc)" : "Sort (asc)");
+        isAscending = !isAscending;
+    }
+
+    /**
+     * Checks if a movie matches the search query.
+     */
+    protected boolean matchesQuery(Movie movie, String query) {
+        return query == null || query.isEmpty() || movie.getTitle().toLowerCase().contains(query.toLowerCase());
+    }
+
+    /**
+     * Checks if a movie matches the selected genre.
+     */
+    protected boolean matchesGenre(Movie movie, String genre) {
+        return genre == null || genre.isEmpty() || movie.getGenres().contains(Genre.valueOf(genre));
     }
 
 }
