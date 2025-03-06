@@ -55,4 +55,37 @@ class HomeControllerTest {
         assertEquals("The Wolf of Wall Street", result.get(1).getTitle());
     }
 
+    @Test
+    void testSearchMovies_ByGenre1() {
+        for (Movie movie : movies) {
+            if (homeController.matchesGenre(movie, "FAMILY")) {
+                assertEquals("Puss in Boots", movie.getTitle());
+            }
+        }
+    }
+
+    @Test
+    void testSearchMovies_ByGenre2() {
+        int counter = 0;
+        for (Movie movie : movies) {
+            if (homeController.matchesQuery(movie, "DRAMA")) {
+                counter++;
+            }
+        }
+        assertEquals(4, counter);
+    }
+
+    @Test
+    void testSearchMovies_ByGenre3() {
+        List<Movie> result = new ArrayList<>();
+        for (Movie movie : movies) {
+            if (homeController.matchesQuery(movie, "ROMANCE")) {
+                result.add(movie);
+            }
+        }
+        assertEquals(2, result.size());
+        assertEquals("Life Is Beautiful", result.get(0).getTitle());
+        assertEquals("The Wolf of Wall Street", result.get(1).getTitle());
+    }
+
 }
