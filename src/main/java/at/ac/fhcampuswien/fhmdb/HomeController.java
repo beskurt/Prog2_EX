@@ -15,8 +15,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class HomeController implements Initializable {
     private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();

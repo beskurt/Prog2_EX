@@ -1,24 +1,18 @@
 package at.ac.fhcampuswien.fhmdb;
 
-import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
-import com.jfoenix.controls.JFXButton;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HomeControllerTest {
     private HomeController homeController;
     private List<Movie> movies;
-    private JFXButton sortBtn;
+
 
     @BeforeEach
     void setUp() {
@@ -30,11 +24,14 @@ class HomeControllerTest {
 
     @Test
     void testSearchMovies_ByTitle1() {
+        List<Movie> result = new ArrayList<>();
         for (Movie movie : movies) {
-            if (homeController.matchesQuery(movie, "Pi")) {
-                assertEquals("Life Is Beautiful", movie.getTitle());
+            if (homeController.matchesQuery(movie, "Life")) {
+                result.add(movie);
             }
         }
+        assertEquals(1, result.size());
+        assertEquals("Life Is Beautiful", result.get(0).getTitle());
     }
 
     @Test
