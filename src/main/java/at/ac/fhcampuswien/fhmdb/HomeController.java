@@ -98,7 +98,7 @@ public class HomeController implements Initializable {
     /**
      * Toggles sorting between ascending & descending order.
      */
-    private void toggleSorting(SortedList<Movie> sortedMovies) {
+    protected void toggleSorting(SortedList<Movie> sortedMovies) {
         sortedMovies.setComparator(isAscending ?
                 Comparator.comparing(Movie::getTitle) :
                 Comparator.comparing(Movie::getTitle).reversed());

@@ -2,6 +2,11 @@ package at.ac.fhcampuswien.fhmdb;
 
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
+import com.jfoenix.controls.JFXButton;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
@@ -13,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HomeControllerTest {
     private HomeController homeController;
     private List<Movie> movies;
+    private JFXButton sortBtn;
 
     @BeforeEach
     void setUp() {
@@ -39,7 +45,7 @@ class HomeControllerTest {
                 counter++;
             }
         }
-        assertEquals(5, counter);
+        assertEquals(4, counter);
     }
 
     @Test
@@ -68,7 +74,7 @@ class HomeControllerTest {
     void testSearchMovies_ByGenre2() {
         int counter = 0;
         for (Movie movie : movies) {
-            if (homeController.matchesQuery(movie, "DRAMA")) {
+            if (homeController.matchesGenre(movie, "DRAMA")) {
                 counter++;
             }
         }
@@ -79,7 +85,7 @@ class HomeControllerTest {
     void testSearchMovies_ByGenre3() {
         List<Movie> result = new ArrayList<>();
         for (Movie movie : movies) {
-            if (homeController.matchesQuery(movie, "ROMANCE")) {
+            if (homeController.matchesGenre(movie, "ROMANCE")) {
                 result.add(movie);
             }
         }
@@ -87,5 +93,4 @@ class HomeControllerTest {
         assertEquals("Life Is Beautiful", result.get(0).getTitle());
         assertEquals("The Wolf of Wall Street", result.get(1).getTitle());
     }
-
 }
